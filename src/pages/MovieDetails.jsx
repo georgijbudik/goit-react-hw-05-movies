@@ -20,7 +20,10 @@ const MovieDetails = () => {
   const [movie, setMovie] = useState({});
   const { movieId } = useParams();
   const location = useLocation();
-  const backLinkHref = location.state?.from ?? '/';
+  const [previousLocation, setPreviousLocation] = useState(
+    location.state?.from ?? '/'
+  );
+
   useEffect(() => {
     const getMovie = async () => {
       try {
@@ -31,7 +34,10 @@ const MovieDetails = () => {
       }
     };
     getMovie();
-  }, [movieId]);
+    if (!location.state?.from) {
+      setPreviousLocation(location.pathname);
+    }
+  }, [movieId, location]);
 
   const {
     poster_path,
@@ -55,7 +61,7 @@ const MovieDetails = () => {
     <>
       {shouldDisplayInfo ? (
         <>
-          <StyledBackLink to={backLinkHref}>Go back</StyledBackLink>
+          <StyledBackLink to={previousLocation}>Go back</StyledBackLink>
           <Container>
             <img
               src={`https://image.tmdb.org/t/p/w500${poster_path}`}
@@ -72,7 +78,7 @@ const MovieDetails = () => {
               <Text>{overview}</Text>
               <Genres>Genres</Genres>
               <GenresWrap>
-                {genres?.map(({ id, name }) => (
+                {genres.map(({ id, name }) => (
                   <p key={id}>{name}</p>
                 ))}
               </GenresWrap>
@@ -83,10 +89,14 @@ const MovieDetails = () => {
             <p>Additional information</p>
             <ul>
               <li>
-                <Link to={`/movies/${id}/cast`}>Cast</Link>
+                <Link to={`/movies/${id}/cast`} state={{ from: location }}>
+                  Cast
+                </Link>
               </li>
               <li>
-                <Link to={`/movies/${id}/reviews`}>Reviews</Link>
+                <Link to={`/movies/${id}/reviews`} state={{ from: location }}>
+                  Reviews
+                </Link>
               </li>
             </ul>
             <Suspense fallback={<div>Loading info...</div>}>

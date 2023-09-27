@@ -13,9 +13,13 @@ const Movies = () => {
 
   const location = useLocation();
 
-  const handleFormSubmit = query => {
-    setSearchQuery(query);
-    updateQueryString(query);
+  const handleSubmit = e => {
+    e.preventDefault();
+    const form = e.target;
+    if (form.value === '') return;
+    setSearchQuery(movieName);
+    updateQueryString(movieName);
+    form.reset();
   };
 
   useEffect(() => {
@@ -41,7 +45,7 @@ const Movies = () => {
   return (
     <div>
       <Container>
-        <SearchBox onSubmit={handleFormSubmit} onChange={updateQueryString} />
+        <SearchBox onSubmit={handleSubmit} onChange={updateQueryString} />
       </Container>
       <ul>
         {movies.map(({ id, title }) => (
